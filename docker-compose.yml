@@ -1,0 +1,26 @@
+version: "3.7"
+
+services:
+  ntnx-volume-plugin-proxy:
+    image: ollijanatuinen/ntnx-volume-plugin-proxy
+    networks:
+      - network
+    ports:
+      - 9440:9440
+    deploy:
+      replicas: 2
+      update_config:
+        parallelism: 1
+        delay: 10s
+      placement:
+        constraints:
+          - node.platform.os == linux
+          - node.role == worker
+    environment:
+      PRISM_IP: "ntnx.domain.local"
+      DEFAULT_CONTAINER: "Docker"
+      AuthorizationBase64: "dXNlcm5hbWU6cGFzc3dvcmQ=" # username:password
+
+networks:
+  network:
+    driver: overlay
