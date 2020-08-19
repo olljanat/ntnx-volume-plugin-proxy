@@ -5,6 +5,7 @@
 set -e
 
 fcgiwrap -s unix:/var/run/fcgiwrap.sock &
+sleep 3s
 chgrp nginx /var/run/fcgiwrap.sock
 chmod g+w /var/run/fcgiwrap.sock
 
