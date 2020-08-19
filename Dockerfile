@@ -18,7 +18,7 @@ COPY docker-entrypoint.d/* /docker-entrypoint.d/
 COPY /scripts/* /scripts/
 COPY --from=build /certs/* /etc/nginx/certs/
 COPY --from=build /.htpasswd /usr/share/nginx/html/
-COPY index.html /usr/share/nginx/html/
+COPY *.html /usr/share/nginx/html/
 COPY default.conf.template /etc/nginx/templates/
 
 ENTRYPOINT ["/docker-entrypoint.sh"]
