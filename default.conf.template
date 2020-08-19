@@ -1,27 +1,32 @@
 server {
-    listen       9440 ssl;
-    server_name  localhost;
-    ssl_certificate /etc/nginx/certs/localhost.crt;
-    ssl_certificate_key /etc/nginx/certs/localhost.key;
+    listen                                  9440 ssl;
+    server_name                             localhost;
+    ssl_certificate                         /etc/nginx/certs/localhost.crt;
+    ssl_certificate_key                     /etc/nginx/certs/localhost.key;
 
     location / {
-        root   /usr/share/nginx/html;
-        index  index.html;
+        auth_basic                          off;
+        root                                /usr/share/nginx/html;
+        index                               index.html;
     }
 
     error_page   500 502 503 504  /50x.html;
     location = /50x.html {
-        root   /usr/share/nginx/html;
+        auth_basic                          off;
+        root                                /usr/share/nginx/html;
     }
 
 	# this is the internal Docker DNS
-    resolver 127.0.0.11;
+    resolver                                127.0.0.11;
+
+    auth_basic                              "Restricted";
+    auth_basic_user_file                    /usr/share/nginx/html/.htpasswd;
 
     set $upstream ${PRISM_IP}:9440;
-    proxy_http_version              1.1;
-    proxy_pass_request_headers      on;
-    proxy_set_header Host           $host;
-    proxy_set_header                Authorization   "Basic ${AuthorizationBase64}";
+    proxy_http_version                      1.1;
+    proxy_pass_request_headers              on;
+    proxy_set_header Host                   $host;
+    proxy_set_header                        Authorization "Basic ${AuthorizationBase64}";
 
     # docker plugin enable nutanix
     location = /PrismGateway/services/rest/v1/containers/ {
@@ -33,7 +38,7 @@ server {
     # docker plugin ls
     # docker volume create --driver nutanix ...
     location = /api/nutanix/v0.8/volume_groups {
-        proxy_pass                      https://$upstream/api/nutanix/v0.8/volume_groups;
+        proxy_pass                          https://$upstream/api/nutanix/v0.8/volume_groups;
     }
 
     location ~* /api/nutanix/v0.8/volume_groups/(.*)/open$ {
@@ -44,7 +49,7 @@ server {
     }
 
     location ~* /api/nutanix/v0.8/volume_groups/(.*)/close$ {
-        # start container
+        # stop container
         if ($request_method = POST ) {
             proxy_pass                      https://$upstream/api/nutanix/v0.8/volume_groups/$1/close;
         }
@@ -65,6 +70,6 @@ server {
 
     # Poll task
     location ~* /api/nutanix/v0.8/tasks/(.*)/poll$ {
-        proxy_pass                      https://$upstream/api/nutanix/v0.8/tasks/$1/poll?timeoutseconds=5;
+        proxy_pass                          https://$upstream/api/nutanix/v0.8/tasks/$1/poll?timeoutseconds=5;
     }
 }
