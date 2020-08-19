@@ -18,7 +18,6 @@ services:
           - node.role == worker
     environment:
       PRISM_IP: "ntnx.domain.local"
-      DEFAULT_CONTAINER: "Docker"
       AuthorizationBase64: "dXNlcm5hbWU6cGFzc3dvcmQ=" # username:password
 
 networks:

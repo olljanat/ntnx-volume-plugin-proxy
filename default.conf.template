@@ -3,6 +3,7 @@ server {
     server_name                             localhost;
     ssl_certificate                         /etc/nginx/certs/localhost.crt;
     ssl_certificate_key                     /etc/nginx/certs/localhost.key;
+    gzip                                    off;
 
     location / {
         auth_basic                          off;
@@ -31,14 +32,37 @@ server {
     # docker plugin enable nutanix
     location = /PrismGateway/services/rest/v1/containers/ {
         if ($request_method = GET ) {
-            proxy_pass                      https://$upstream/PrismGateway/services/rest/v1/containers/?searchString=${DEFAULT_CONTAINER};
+            proxy_pass                      https://$upstream/PrismGateway/services/rest/v1/containers/?searchString=$remote_user;
+        }
+    }
+
+    location = /api/nutanix/v0.8/volume_groups {
+        # docker volume create --driver nutanix ...
+        if ($request_method = POST ) {
+            proxy_pass                          https://$upstream/api/nutanix/v0.8/volume_groups;
+        }
+
+        # NGINX does not natively support switching to fastcgi under if
+        # so we use "echo_location" function from module ngx_echo
+        # to call /volume_groups/list
+        if ($request_method = GET ) {
+            echo_location /volume_groups/list;
         }
     }
 
     # docker plugin ls
-    # docker volume create --driver nutanix ...
-    location = /api/nutanix/v0.8/volume_groups {
-        proxy_pass                          https://$upstream/api/nutanix/v0.8/volume_groups;
+    # docker volume ls
+    location = /volume_groups/list {
+        fastcgi_buffering                   off;
+        fastcgi_param                       NO_BUFFERING 1;
+        fastcgi_param                       DOCUMENT_ROOT $document_root;
+
+        fastcgi_pass                        unix:/var/run/fcgiwrap.sock;
+        include                             /etc/nginx/fastcgi_params;
+        fastcgi_param                       SCRIPT_FILENAME /scripts/volume_groups.sh;
+        fastcgi_param                       UPSTREAM $upstream;
+        fastcgi_param                       AuthorizationBase64 "${AuthorizationBase64}";
+        fastcgi_param                       REMOTE_USER $remote_user;
     }
 
     location ~* /api/nutanix/v0.8/volume_groups/(.*)/open$ {
