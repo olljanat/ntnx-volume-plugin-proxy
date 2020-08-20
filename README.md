@@ -78,3 +78,15 @@ PRISM_PASSWORD="<password you choose>" \
 DEFAULT_CONTAINER="docker_dev" \
 --alias nutanix
 ```
+
+## Troubleshooting
+Most common error message you will see when you try install/enable is:
+```
+Error response from daemon: dial unix /run/docker/plugins/<id>/nutanix.sock: connect: no such file or directory
+```
+more details about that one you can find from ntnx-volume-plugin-proxy container log.
+
+Most common problems are:
+* Network connectivity issues
+* Incorrect username/password
+* DEFAULT_CONTAINER variable value does not match to username
