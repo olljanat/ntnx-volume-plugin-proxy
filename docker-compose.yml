@@ -1,7 +1,7 @@
 version: "3.7"
 
 services:
-  ntnx-volume-plugin-proxy:
+  proxy:
     image: ollijanatuinen/ntnx-volume-plugin-proxy
     networks:
       - network
@@ -19,7 +19,14 @@ services:
     environment:
       PRISM_IP: "ntnx.domain.local"
       AuthorizationBase64: "dXNlcm5hbWU6cGFzc3dvcmQ=" # username:password
+    secrets:
+     - source: htpasswd_${HTPASSWD_TIMESTAMP}
+       target: /usr/share/nginx/html/.htpasswd
 
+secrets:
+  appsettings.secret.json:
+    name: htpasswd_${HTPASSWD_TIMESTAMP}
+    file: ./.htpasswd
 networks:
   network:
     driver: overlay

@@ -1,4 +1,6 @@
 .gitattributes
 .gitignore
+.htpasswd
 Dockerfile
 README.md
+pictures/*
