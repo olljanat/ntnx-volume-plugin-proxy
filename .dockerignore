@@ -1,6 +1,7 @@
 .gitattributes
 .gitignore
 .htpasswd
+docker-compose.yml
 Dockerfile
 README.md
 pictures/*
