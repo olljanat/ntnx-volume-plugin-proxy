@@ -100,7 +100,7 @@ iSCSI initiator error: Target volume: <volume name> not found. Please ensure tha
 ```
 Then check that iscsid is able to reach volume using command:
 ```
-iscsiadm --mode discovery -t sendtargets --portal <volume name>
+iscsiadm --mode discovery -t sendtargets --portal ntnx-data.domain.local
 ```
 
 You can also find plugin error log from `/var/lib/docker/plugins/<id>/rootfs/nvp.log`
