@@ -80,6 +80,7 @@ DEFAULT_CONTAINER="docker_dev" \
 ```
 
 ## Troubleshooting
+### Plugin enable failure
 Most common error message you will see when you try install/enable is:
 ```
 Error response from daemon: dial unix /run/docker/plugins/<id>/nutanix.sock: connect: no such file or directory
@@ -90,3 +91,16 @@ Most common problems are:
 * Network connectivity issues
 * Incorrect username/password
 * DEFAULT_CONTAINER variable value does not match to username
+
+### Volume mount error:
+If volume mount fails to error like:
+```
+docker: Error response from daemon: error while mounting volume '/var/lib/docker/plugins/<id>/rootfs':
+iSCSI initiator error: Target volume: <volume name> not found. Please ensure that the dataservices IP: ntnx-data.domain.local:3260 is correct and reachable on port 3260.
+```
+Then check that iscsid is able to reach volume using command:
+```
+iscsiadm --mode discovery -t sendtargets --portal <volume name>
+```
+
+You can also find plugin error log from `/var/lib/docker/plugins/<id>/rootfs/nvp.log`
