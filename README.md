@@ -102,5 +102,6 @@ Then check that iscsid is able to reach volume using command:
 ```
 iscsiadm --mode discovery -t sendtargets --portal ntnx-data.domain.local
 ```
+Other possible issue is that volume is already in use by some other container.
 
 You can also find plugin error log from `/var/lib/docker/plugins/<id>/rootfs/nvp.log`
